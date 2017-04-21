@@ -5,8 +5,9 @@ This is an implementation of a simple math parser that operate on integers and h
 _**Digit** = "0"|"1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9";_  
 _**Number** = {Digit};_  
 _**Phrase** = "(" Expression ")";_  
-_**Term** = Number | Phrase;_  
+_**Term** = [UnarySubtr,] Number | Phrase;_  
 _**Operator** = "+"|"-"|"*"|"/";_  
+_**UnarySubtr** = "-";_  
 _**Expression** = Term [, {Operator, Term}];_  
 
 
