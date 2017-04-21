@@ -24,10 +24,10 @@ The operators used and its precedence is given by:
 
 Operator | Precedence | Associativity | # arguments
 :------: | :--------: | :-----------: | :---------:
-*        |  2         |     Left      |         2
-/        |  2         |     Left      |         2
-+        |  1         |     Left      |         2
--        |  1         |     Left      |         2
+"*"      |  2         |     Left      |         2
+"/"      |  2         |     Left      |         2
+"+"      |  1         |     Left      |         2
+"-"      |  1         |     Left      |         2
 
      
      
