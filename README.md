@@ -1,4 +1,4 @@
-# Calculate an Mathematical Expression – A Math Parser
+# Calculate a Mathematical Expression – A Math Parser
 
 This is an implementation of a simple math parser that operate on integers and handle the four basic binary operations ('+','-','/','*') including the use of parenthesis (the unary operator '-' is not part of the parser). However, it can easily be extended to handle other operators and functions. The parser is based on a context-free gramma defined by the following production rules (described in Extended Backus–Naur form (EBNF)):
 
@@ -10,7 +10,7 @@ _**Operator** = "+"|"-"|"*"|"/";_
 _**Expression** = Term [, {Operator, Term}];_  
 
 
-The parser transform a mathematical string, given on infix notation, to a postfix notation (or reverse polish notation) and calculate the result. It removes potential white characters in the string and then tokenize it to its mathematical tokens or parts. The parser perform a syntax check based on the gramma production rules above and cast an exception if any syntax errors is found. The postfix notation is provided by the Shutting-Yard algorithm. Finally, not part of the parser, the result is calculated.
+The parser transform a mathematical string, given on infix notation, to a postfix notation (or reverse polish notation) and calculate the result. It removes potential white characters in the string and tokenize it to its mathematical tokens or parts. The parser perform a syntax check based on the gramma production rules above and cast an exception if any syntax errors is found. The postfix notation is provided by the Shutting-Yard algorithm. Finally, not part of the parser, the result is calculated.
 
 
 1. Remove white from the input string
