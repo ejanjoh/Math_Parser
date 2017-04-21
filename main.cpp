@@ -3,7 +3,7 @@
  *      Autor:      Jan Johansson (ejanjoh)
  *      Copyright:  Copyright (c) 2017 Jan Johansson (ejanjoh)
  *      Created:    2017-04-04
- *      Updated:
+ *      Updated:    2017-04-21
  *
  *      Project:    Calculate Matematical Expression (Math_Parser)
  *      File name:  main.cpp
@@ -12,6 +12,7 @@
  *      Version history mapped on changes in this file:
  *      -----------------------------------------------
  *      ver 1       Created
+ *      ver 4       Added support for unary subtraction
  *
  *
  *      Reference: Shunting-yard algorithm https://en.m.wikipedia.org/wiki/Shunting-yard_algorithm
@@ -37,6 +38,7 @@ using namespace std;
 static unsigned long RemoveWhite(const string& str_in, string& str_out);
 static void Tokenize(const char *str, TokenList& toklist) throw (overflow_error, runtime_error);
 static unsigned int GetNextToken(const char *str, unsigned int index, char *tok) throw (overflow_error);
+static bool UnarySubtraction(tokentype_t prev);
 static void ShuttingYard(TokenList& tokenList, TokenList& outputList) throw (out_of_range, SortingError);
 static int Calculate(TokenList& reversedList) throw (overflow_error, invalid_argument);
 static void DisplayResult(TokenList& tokenList, bool comma = false) throw (logic_error);
@@ -93,6 +95,7 @@ static void Tokenize(const char *str, TokenList& toklist) throw (overflow_error,
 {
     char tok[TOKEN_SIZE + 1];
     unsigned int i = 0;
+    tokentype_t prevToken = eUninit;
     
     while(1) {
         if ('\0' == str[i]) {
@@ -104,21 +107,33 @@ static void Tokenize(const char *str, TokenList& toklist) throw (overflow_error,
         switch (tok[0]) {
             case '(':
                 toklist.Add(tok, eLParent);
+                prevToken = eLParent;
                 break;
             case ')':
                 toklist.Add(tok, eRParent);
+                prevToken = eRParent;
                 break;
             case '*':
                 toklist.Add(tok, eMult);
+                prevToken = eMult;
                 break;
             case '+':
                 toklist.Add(tok, eAdd);
+                prevToken = eAdd;
                 break;
             case '-':
-                toklist.Add(tok, eSubtr);
+                if (not UnarySubtraction(prevToken)) {
+                    toklist.Add(tok, eSubtr);
+                    prevToken = eSubtr;
+                }
+                else {
+                    toklist.Add(tok, eUnarySubtr);
+                    prevToken = eUnarySubtr;
+                }
                 break;
             case '/':
                 toklist.Add(tok, eDiv);
+                prevToken = eDiv;
                 break;
             case '0':
             case '1':
@@ -131,10 +146,10 @@ static void Tokenize(const char *str, TokenList& toklist) throw (overflow_error,
             case '8':
             case '9':
                 toklist.Add(tok, eNumber, atoi(tok));
+                prevToken = eNumber;
                 break;
             default:
                 throw runtime_error("unknown token in Tokenize");
-                ;
         }   // switch...
     }   // for...
 
@@ -165,6 +180,28 @@ static unsigned int GetNextToken(const char *str, unsigned int index, char *tok)
 }
 
 
+static bool UnarySubtraction(tokentype_t prev)
+{
+    bool ret;
+    
+    switch (prev) {
+        case eUninit:           // if first token...
+        case eLParent:
+        case eMult:
+        case eDiv:
+        case eAdd:
+        case eSubtr:
+            ret = true;
+            break;
+        default:
+            ret = false;
+            break;
+    }
+
+    return ret;
+}
+
+
 // NOTE:
 // To increase performance this fuction and Calculate should be merged. ShuttingYard involves a lot of
 // copying (not needed). Keep it if you want the expression in a Reverse Polish Notation (i.e. in postfix notation)...
@@ -185,6 +222,7 @@ static void ShuttingYard(TokenList& tokenList, TokenList& outputList) throw (out
             case eSubtr:
             case eMult:
             case eDiv:
+            case eUnarySubtr:
                 sortOperator = 1;
                 
                 while (sortOperator) {
@@ -195,6 +233,10 @@ static void ShuttingYard(TokenList& tokenList, TokenList& outputList) throw (out
                     else if (eLParent == operatorStack.top()->GetTokenType()) {
                         operatorStack.push(tokenList[i]);
                         sortOperator = 0;
+                    }
+                    else if (eUnarySubtr == operatorStack.top()->GetTokenType()) {
+                        outputList.Add(".", operatorStack.top()->GetTokenType());
+                        operatorStack.pop();
                     }
                     else if (type > operatorStack.top()->GetTokenType()) {
                         operatorStack.push(tokenList[i]);
@@ -282,6 +324,11 @@ static int Calculate(TokenList& reversedList) throw (overflow_error, invalid_arg
                     throw invalid_argument("invalid argument in Calculate(2)");
                 }
                 break;
+            case eUnarySubtr:
+                op1 = (-1)*output.back();
+                output.pop_back();
+                output.push_back(op1);
+                break;
             default:
                 throw invalid_argument("invalid argument in Calculate(1)");
                 break;
@@ -327,6 +374,9 @@ static void DisplayResult(TokenList& tokenList, bool comma) throw (logic_error)
                 break;
             case eRParent:
                 cout << ')';
+                break;
+            case eUnarySubtr:
+                cout << '-';
                 break;
             default:
                 throw logic_error("can't print the expression");

@@ -1,6 +1,6 @@
 # Calculate a Mathematical Expression – A Math Parser
 
-This is an implementation of a simple math parser that operate on integers and handle the four basic binary operations ('+','-','/','*') including the use of parenthesis (the unary operator '-' is not part of the parser). However, it can easily be extended to handle other operators and functions. The parser is based on a context-free gramma defined by the following production rules (described in Extended Backus–Naur form (EBNF)):
+This is an implementation of a simple math parser that operate on integers and handle the four basic binary operations ('+','-','/','*') including the use of parenthesis. However, it can easily be extended to handle other operators and functions. The parser is based on a context-free gramma defined by the following production rules (described in Extended Backus–Naur form (EBNF)):
 
 _**Digit** = "0"|"1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9";_  
 _**Number** = {Digit};_  

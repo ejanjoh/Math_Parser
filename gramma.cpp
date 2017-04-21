@@ -3,7 +3,7 @@
  *      Autor:      Jan Johansson (ejanjoh)
  *      Copyright:  Copyright (c) 2017 Jan Johansson (ejanjoh)
  *      Created:    2017-04-07
- *      Updated:
+ *      Updated:    2017-04-21
  *
  *      Project:    Calculate Matematical Expression (Math_Parser)
  *      File name:  gramma.cpp
@@ -12,6 +12,7 @@
  *      Version history mapped on changes in this file:
  *      -----------------------------------------------
  *      ver 1       Created
+ *      ver 4       Added support for unary subtraction
  *
  *
  *      Reference: 
@@ -26,6 +27,7 @@ static unsigned int IsTerm(unsigned int first, unsigned int last, TokenList& tok
 static unsigned int IsOperator(unsigned int first, unsigned int last, TokenList& tokenList) throw (GrammaError);
 static unsigned int IsNumber(unsigned int first, unsigned int last, TokenList& tokenList) throw (GrammaError);
 static unsigned int IsPhrase(unsigned int first, unsigned int last, TokenList& tokenList) throw (GrammaError);
+static unsigned int IsUnarySubtr(unsigned int first, unsigned int last, TokenList& tokenList) throw (GrammaError);
 
 
 void CheckGramma(unsigned int first, unsigned int last, TokenList& tokenList) throw (GrammaError)
@@ -79,6 +81,9 @@ static unsigned int IsTerm(unsigned int first, unsigned int last, TokenList& tok
             break;
         case eLParent:
             next = IsPhrase(first, last, tokenList);
+            break;
+        case eUnarySubtr:
+            next = IsUnarySubtr(first + 1, last, tokenList);
             break;
         default:
             throw GrammaError("syntax error (IsTerm(2))");
@@ -151,5 +156,12 @@ static unsigned int IsPhrase(unsigned int first, unsigned int last, TokenList& t
 }
 
 
-
+static unsigned int IsUnarySubtr(unsigned int first, unsigned int last, TokenList& tokenList) throw (GrammaError)
+{
+    if (first > last) {
+        throw GrammaError("syntax error (IsUnarySubtr)");
+    }
+    
+    return IsTerm(first, last, tokenList);
+}
 
